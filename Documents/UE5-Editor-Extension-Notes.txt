@@ -84,3 +84,14 @@ BUG / ISSUE / Intended Behavior(?)
 * Now, the right-click -> Scripted Asset Actions menu should appear
 
 ------------------------------------------
+DEBUG MESSAGES:
+
+Note:
+* In the Editor, the AddOnScreenDebugMessage() was NOT displaying until I enabled FPS:
+* Open console (~), then type stat FPS
+* This is also in the Upper-Left hamburger menu:
+  * Show FPS
+  * Show Stats
+* These enable "real-time"
+
+------------------------------------------

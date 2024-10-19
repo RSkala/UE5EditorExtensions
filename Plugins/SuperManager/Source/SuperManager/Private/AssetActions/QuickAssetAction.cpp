@@ -2,10 +2,10 @@
 
 #include "AssetActions/QuickAssetAction.h"
 
+#include "DebugHeader.h"
+
 void UQuickAssetAction::TestFunc()
 {
-	if (GEngine != nullptr)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 8.0f, FColor::Cyan, TEXT("UQuickAssetAction::TestFunc"));
-	}
+	Print(TEXT("UQuickAssetAction::TestFunc"), FColor::Cyan);
+	PrintLog(TEXT("UQuickAssetAction::TestFunc"));
 }
