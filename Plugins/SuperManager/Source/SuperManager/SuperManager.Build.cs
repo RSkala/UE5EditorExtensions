@@ -26,7 +26,8 @@ public class SuperManager : ModuleRules
 			new string[]
 			{
 				"Core",
-				"Blutility"
+				"Blutility",
+				"UnrealEd"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

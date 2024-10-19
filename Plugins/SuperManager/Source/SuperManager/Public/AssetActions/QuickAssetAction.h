@@ -14,5 +14,9 @@ class SUPERMANAGER_API UQuickAssetAction : public UAssetActionUtility
 public:
 	UFUNCTION(CallInEditor)
 	void TestFunc();
+
+private:
+	UFUNCTION(CallInEditor, meta = (AllowPrivateAccess = true)) // AllowPrivateAccess is needed for the dialog to show up when private
+	void PrintViewportAspectRatio();
 	
 };
