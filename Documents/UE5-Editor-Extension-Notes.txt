@@ -45,12 +45,42 @@ After the Plugin is created, you need to open the .uplugin file and change the f
 * "LoadingPhase" = "PreDefault" => Decides when the Module will be loaded, so now this Module will be loaded before the Game module. (Note we didnt say Plugin here)
 
 ======================================================
+QUICK ASSET ACTIONS
 
+Some types of Actions (Built-in Classes):
+* Actions to assets:        AssetActionUtility
+* Actions to actors:        ActorActionUtility
 
+Mark functions with CallInEditor to use these:
+UFUNCTION(CallInEditor):  A button will be added to the menu options when we right click
 
+Possible bug in Scripted Asset Action:
+* Note: This is intended behavior in UE5.4
+* https://www.udemy.com/course/unrealengine5-c-one-course-solution-for-extending-editor/learn/lecture/38588548
 
+Tools -> New C++ Class -> All Classes -> AssetActionUtility
+* IMPORTANT: Make sure the class is inside our Editor Module
 
+Need to add Blutility as a Dependency in our module's Build.cs file
+NOTE: Adding as a Public dependency causes build errors
+QuickAssetAction.h(6): fatal error C1083: Cannot open include file: 'AssetActionUtility.h': No such file or directory
+1>[2/8] Compile [x64] Module.SuperManager.cpp
 
+NOTE:
+* Be careful which Build.cs file you edit!  I was editing the wrong one (was editing ExtendEditor.Build.cs, which is the project, and NOT the plugin, which is SuperManager.Build.cs)
+* I did NOT need to include the extra paths, as they are not there in UE5.4 (the PrivateIncludePaths in Blutility.Build.cs)
 
+------------------------------------------
+BUG / ISSUE / Intended Behavior(?)
 
+* After adding the QuickAssetActions, it did NOT show ScriptedAssetActions for TestFunc.
+* I remember this from before, you need to make a blueprint (or do this in the C++) for included assets, I believe.
 
+* You MUST make a Blueprint asset:
+  * In your PLUGIN Content folder, right-click -> Editor Utilities -> Editor Utility Blueprint
+  * In AllClasses -> Type/Find your class (e.g. QuickAssetAction)
+  * EUBP_QuickAssetAction
+
+* Now, the right-click -> Scripted Asset Actions menu should appear
+
+------------------------------------------
