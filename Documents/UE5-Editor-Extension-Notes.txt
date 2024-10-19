@@ -1,0 +1,56 @@
+
+===================================
+Unreal Engine 5 Editor Extensions
+===================================
+
+======================================================
+---------------------------------------
+MODULES:
+* Modules are basically building blocks for the ending
+* Ensure good code separateion
+* All moudles require a [ModuleName].Build.cs
+  * In fact, every C++ project has one, e.g. EditorExtend.Build.cs
+* Outside modules can be included by adding them to the Build.cs file
+
+Modules:
+https://dev.epicgames.com/documentation/en-us/unreal-engine/modules?application_version=4.27
+
+Loading Phases:
+https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Runtime/Projects/ELoadingPhase__Type?application_version=5.0
+
+------------------
+PLUGINS:
+For this project, since all the functionality will be related to the Editor, a Plugin is perfect for this.
+
+Creating a Plugin
+* Edit -> Plugins -> click +Add
+* There are multiple templates to choose from:
+  * Blank, Content Only, Blueprint Library, Editor Mode, Editor Standalone Window, Editor Toolbar Button, Third Party Library
+
+* For this project, we select Blank. This course will do everything from scratch so by the end, we will understand what all the templates do.
+* The "Blank" project will appear in the Editor's Plugin list, but will NOT register any buttons or menu entries. We will do these manually.
+
+NOTE:
+* By creating a Plugin, you are ALSO creating a Module
+* The Plugin name will be the Module name
+  * So this is not something you can change later (?)
+  * So choose your name carefully!
+
+* Click Create Plugin after filling the Plugin Name field.
+
+After the Plugin is created, you need to open the .uplugin file and change the following:
+* In the Modules
+* Type = "Runtime"  => If the plugin, will have impact on the game code, you want this to be "Runtime"
+* "Type" = "Editor" => If it's only for the Editor
+* "LoadingPhase" = "PreDefault" => Decides when the Module will be loaded, so now this Module will be loaded before the Game module. (Note we didnt say Plugin here)
+
+======================================================
+
+
+
+
+
+
+
+
+
