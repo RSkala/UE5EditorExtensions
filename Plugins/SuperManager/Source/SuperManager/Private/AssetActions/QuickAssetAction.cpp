@@ -4,6 +4,8 @@
 
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
+#include "EditorAssetLibrary.h"
+#include "EditorUtilityLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "DebugHeader.h"
@@ -12,6 +14,58 @@ void UQuickAssetAction::TestFunc()
 {
 	Print(TEXT("UQuickAssetAction::TestFunc"), FColor::Cyan);
 	PrintLog(TEXT("UQuickAssetAction::TestFunc"));
+}
+
+void UQuickAssetAction::DuplicateAssets(int32 NumOfDuplicates)
+{
+	if (NumOfDuplicates <= 0)
+	{
+		Print(TEXT("Please enter a VALID number"), FColor::Red);
+		return;
+	}
+
+	TArray<FAssetData> SelectedAssetsData = UEditorUtilityLibrary::GetSelectedAssetData();
+	uint32 DuplicatedAssetCounter = 0;
+
+	for (const FAssetData& SelectedAssetData : SelectedAssetsData)
+	{
+		for (int32 i = 0; i < NumOfDuplicates; ++i)
+		{
+			// Get the path of the current asset
+			const FString SourceAssetPath = SelectedAssetData.ObjectPath.ToString();
+
+			// Get the name of the current asset and append "_x" to the end
+			const FString NewDuplicatedAssetName = SelectedAssetData.AssetName.ToString() + TEXT("_") + FString::FromInt(i + 1);
+
+			// Get the full path of the current asset folder. Need to combine so the path has slashes.
+			const FString NewPathName = FPaths::Combine(SelectedAssetData.PackagePath.ToString(), NewDuplicatedAssetName);
+
+			// Duplicate the asset
+			UObject* NewDuplicatedAsset = UEditorAssetLibrary::DuplicateAsset(SourceAssetPath, NewPathName);
+			if (NewDuplicatedAsset != nullptr)
+			{
+				// We have successfully duplicated the asset, save the asset immediately
+				UEditorAssetLibrary::SaveAsset(NewPathName, false);
+
+				// Increment the counter
+				++DuplicatedAssetCounter;
+			}
+		}
+	}
+
+	if (DuplicatedAssetCounter > 0)
+	{
+		Print(TEXT("Successfully duplicated" + FString::FromInt(DuplicatedAssetCounter) + " asset files."), FColor::Green);
+	}
+	else
+	{
+		Print(TEXT("No assets duplicated"), FColor::Green);
+	}
+}
+
+void UQuickAssetAction::TestCallInEditorString(FString TestString)
+{
+	UE_LOG(LogTemp, Warning, TEXT("User entered: %s"), *TestString);
 }
 
 void UQuickAssetAction::PrintViewportAspectRatio()

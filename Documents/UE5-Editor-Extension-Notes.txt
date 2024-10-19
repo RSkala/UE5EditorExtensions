@@ -95,3 +95,82 @@ Note:
 * These enable "real-time"
 
 ------------------------------------------
+=========================================================
+Scripting Libraries
+
+Two Editor Scripting Libraries:
+* UEditorUtilityLibrary
+* UEditorAssetLibrary
+
+Some of the most important static functions in these:
+
+UEditorUtilityLibrary
+* GetSelectedAssets()
+* GetSelectedAssetData()
+
+UEditorAssetLibrary
+* ListAssets()
+
+------------------------------------------------
+DUPLICATING:
+
+* UEditorUtilityLibrary::GetSelectedAssetData()
+* UEditorAssetLibrary::DuplicateAsset
+
+------------------------------------------------
+
+FAssetData: Gives more info about selected assets
+
+
+EditorAssetLibrary.h:
+* Requires EditorScriptingUtilities in Build.cs
+
+
+EXEC : warning : Plugin 'SuperManager' does not list plugin 'EditorScriptingUtilities' as a dependency, but module 'SuperManager' depends on module 'EditorScriptingUtilities'.
+
+From ChatGPT:
+This warning in Unreal Engine 5 (UE5) indicates that your SuperManager plugin is dependent on the EditorScriptingUtilities module, but the plugin's configuration file (.uplugin) does not explicitly declare this dependency. To resolve the warning, you need to specify the dependency in the plugin's .uplugin file.
+
+Needed to add this to the uplugin, under "Modules", "DependencyModuleNames":
+
+"EditorScriptingUtilities"
+
+"DependencyModuleNames": [ "EditorScriptingUtilities" ]
+
+
+  "Modules": [
+    {
+      "Name": "SuperManager",
+      "Type": "Editor",
+      "LoadingPhase": "PreDefault",
+      "DependencyModuleNames": [ "EditorScriptingUtilities" ]
+    }
+  ]
+
+  Had to shut down VS, generate VS project files, then open VS again and the warning was fixed
+
+--------------------------------------------------
+ASSET BATCH DUPLICATION
+
+static UObject* DuplicateAsset(SourceAssetPath, DestinationAssetPath);
+
+Object Path:   the object path + name.name
+Package Path:  the folder path
+
+FAssetData has what we need
+
+
+NOTE:
+* If your ScriptedAssetActions do NOT appear, then you will probably need to open the Blueprint and save the Blueprint class again (that derives from your C++ AssetActionUtility)
+
+-------------------------------
+If a CallInEditor UFUNCTION has an int parameter, then a dialog will appear to enter the value:
+void DuplicateAssets(int32 NumOfDuplicates);
+
+Also a popup to enter a string will appear as well:
+void TestCallInEditorString(FString TestString);
+
+
+--------------------------------------------------
+
+

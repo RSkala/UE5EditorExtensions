@@ -27,7 +27,8 @@ public class SuperManager : ModuleRules
 			{
 				"Core",
 				"Blutility",
-				"UnrealEd"
+				"UnrealEd",
+				"EditorScriptingUtilities"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

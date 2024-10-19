@@ -18,7 +18,8 @@
 		{
 			"Name": "SuperManager",
 			"Type": "Editor",
-			"LoadingPhase": "PreDefault"
+			"LoadingPhase": "PreDefault",
+			"DependencyModuleNames": [ "EditorScriptingUtilities" ]
 		}
 	]
 }

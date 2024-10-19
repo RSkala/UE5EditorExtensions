@@ -16,6 +16,12 @@ public:
 	void TestFunc();
 
 private:
+	UFUNCTION(CallInEditor, meta = (AllowPrivateAccess = true))
+	void DuplicateAssets(int32 NumOfDuplicates);
+
+	UFUNCTION(CallInEditor, meta = (AllowPrivateAccess = true))
+	void TestCallInEditorString(FString TestString);
+
 	UFUNCTION(CallInEditor, meta = (AllowPrivateAccess = true)) // AllowPrivateAccess is needed for the dialog to show up when private
 	void PrintViewportAspectRatio();
 	
