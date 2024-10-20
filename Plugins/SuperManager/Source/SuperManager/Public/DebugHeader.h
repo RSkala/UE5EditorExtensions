@@ -23,7 +23,9 @@ EAppReturnType::Type ShowMsgDialog(EAppMsgType::Type MsgType, const FString& Mes
 	if (bShowMsgAsWarning)
 	{
 		FText MsgTitle = FText::FromString(TEXT("Warning"));
-		return FMessageDialog::Open(MsgType, FText::FromString(Message), &MsgTitle);
+
+		//return FMessageDialog::Open(MsgType, FText::FromString(Message), &MsgTitle); // DEPRECATED
+		return FMessageDialog::Open(MsgType, FText::FromString(Message), MsgTitle);
 	}
 	else
 	{

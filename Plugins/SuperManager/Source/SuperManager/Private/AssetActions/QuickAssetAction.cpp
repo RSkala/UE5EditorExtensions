@@ -33,7 +33,8 @@ void UQuickAssetAction::DuplicateAssets(int32 NumOfDuplicates)
 		for (int32 i = 0; i < NumOfDuplicates; ++i)
 		{
 			// Get the path of the current asset
-			const FString SourceAssetPath = SelectedAssetData.ObjectPath.ToString();
+			//const FString SourceAssetPath = SelectedAssetData.ObjectPath.ToString(); // DEPRECATED
+			const FString SourceAssetPath = SelectedAssetData.GetObjectPathString();
 
 			// Get the name of the current asset and append "_x" to the end
 			const FString NewDuplicatedAssetName = SelectedAssetData.AssetName.ToString() + TEXT("_") + FString::FromInt(i + 1);

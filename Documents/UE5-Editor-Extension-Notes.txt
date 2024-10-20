@@ -242,4 +242,13 @@ A Material Instance is really UMaterialInstanceConstant
             }
           }
 
+
+--------------------------------------------
+Warnings:
+
+  C:\Dev\Udemy\VincePetrelli\ExtendEditor\Plugins\SuperManager\Source\SuperManager\Public\DebugHeader.h(26): warning C4996: 'FMessageDialog::Open': Use the overload of Open that takes the Title by-value. Please update your code to the new API before upgrading to the next release, otherwise your project will no longer compile.
+
+  C:\Dev\Udemy\VincePetrelli\ExtendEditor\Plugins\SuperManager\Source\SuperManager\Private\AssetActions\QuickAssetAction.cpp(37): warning C4996: 'FAssetData::ObjectPath': FName asset paths have been deprecated. Use GetSoftObjectPath to get the path this asset will use in memory when loaded or GetObjectPathString() if you were just doing ObjectPath.ToString() Please update your code to the new API before upgrading to the next release, otherwise your project will no longer compile.
+
+
 ========================================================
