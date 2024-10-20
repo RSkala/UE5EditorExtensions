@@ -1,0 +1,89 @@
+===============================
+Slate Widget
+===============================
+
+--------------------------------------------------
+What is Slate:
+* Unreal's Editor interface is larely built using Slate
+
+Challenges with Slate
+* Unique Syntax
+* Hard to Visualize, since done all through code
+* Communication with different modules
+
+--------------------------------------------------
+SMART POINTERS
+
+* Designed to ease the burdern of memory allocation and tracking
+
+Unreal Smart Pointer Library:
+https://dev.epicgames.com/documentation/en-us/unreal-engine/smart-pointers-in-unreal-engine?application_version=5.4
+
+Example:
+Standard C++:
+FExtender* MenuExtender = new FExtender()
+...
+delete MenuExtender; // MUST free the memory
+
+Unreal C++:
+TSharedRef<FExtender> MenuExtender(new FExtender())
+...
+Memory automatically freed
+
+----------------------
+4 Smart Pointer Types
+* SharedPointers (TSharedPtr)
+* SharedReferences (TSharedRef)
+* WeakPointers (TWeakPtr)
+* UniquePointers
+
+Here, we are only going to be using first 3
+
+======================================
+Smart Pointer Properties
+
+TSharedPtr 
+* Owns the object: Yes
+* Prevent Deletion: Yes, Reference Counting
+* Unique Property: Can point to null
+
+TSharedRef
+* Owns the object: Yes
+* Prevent Deletion: Yes
+* Unique Property: Must point to a valid object
+
+TWeakPtr
+* Owns the object: No
+* Prevent Deletion: No
+* Unique Property: Breaks the reference cycle
+
+
+NOTE:
+* Smart Pointers cannot be used with UObject system!
+* UObject system has its own garbage collection!
+* i.e. an AActor class member variables must be marked as UPROPERTY()
+
+The equivalent for UObjects is:
+TWeakObjectPtr<AActor> MyActor
+
+The difference between TWeakPtr and TWeakObjectPtr is that TWeakObjectPtr is designed specifically for handling UObjects
+
+----------------
+Syntax
+
+TSharedRef<FExtender> MenuExtender(new FExtender())
+
+Other ways to create these:
+* MakeShareable()
+* MakeShared()
+
+TSharedRef<FExtender> MenuExtender = MakeShareable(new FExtender());
+
+const FAssetData AssetData = UEditorAssetLibrary::FindAssetData(AssetPathName);
+TSharedPtr<FAssetData> AssetDataSharedPtr = MakeShared<FAssetData>(AssetData);
+
+MakeShared() is more efficient than MakeSharable()
+
+
+======================================
+What We Want to Achieve Using Slate Widgets
