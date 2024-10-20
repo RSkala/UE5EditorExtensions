@@ -46,6 +46,9 @@ private:
 	UFUNCTION(CallInEditor, meta = (AllowPrivateAccess = true))
 	void AddPrefixes();
 
+	UFUNCTION(CallInEditor, meta = (AllowPrivateAccess = true))
+	void RemoveUnusedAssets();
+
 private:
 	TMap<UClass*, FString> PrefixMap =
 	{

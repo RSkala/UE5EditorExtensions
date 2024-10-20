@@ -252,3 +252,32 @@ Warnings:
 
 
 ========================================================
+DELETING UNUSED ASSETS
+
+* An "Unused" asset is one that has no Asset References
+
+UEditorAssetLibrary::FindPackageReferencersForAsset()
+
+
+--------
+Using this to delete assets, so there is user confirmation:
+#include "ObjectTools.h"
+ObjectTools::DeleteAssets(UnusedAssetsData, true);
+
+NOTE: UnrealEd module must be included into the Build.cs file
+
+In order to delete unused assets, you need to use the AssetRegistry:
+
+  FAssetRegistryModule& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(AssetRegistryConstants::ModuleName);
+  for (const FAssetData& SelectedAssetData : SelectedAssetsData)
+  {
+    TArray<FName> AssetDependencies;
+    AssetRegistry.Get().GetDependencies(SelectedAssetData.PackageName, AssetDependencies);
+    if (AssetDependencies.Num() == 0)
+    {
+      UnusedAssetsData.Add(SelectedAssetData);
+    }
+  }
+
+========================================================
+

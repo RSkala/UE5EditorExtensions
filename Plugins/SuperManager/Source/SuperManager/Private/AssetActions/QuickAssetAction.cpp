@@ -2,12 +2,14 @@
 
 #include "AssetActions/QuickAssetAction.h"
 
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "EditorAssetLibrary.h"
 #include "EditorUtilityLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Misc/MessageDialog.h"
+#include "ObjectTools.h"
 
 #include "DebugHeader.h"
 
@@ -181,4 +183,54 @@ void UQuickAssetAction::AddPrefixes()
 	{
 		ShowNotifyInfo(TEXT("Successfully renamed ") + FString::FromInt(Counter) + " assets");
 	}
+}
+
+void UQuickAssetAction::RemoveUnusedAssets()
+{
+	TArray<FAssetData> SelectedAssetsData = UEditorUtilityLibrary::GetSelectedAssetData();
+	TArray<FAssetData> UnusedAssetsData;
+
+	// NOTE: This does NOT work in UE5.4. The standard delete dialog appears.
+	/*
+	for (const FAssetData& SelectedAssetData : SelectedAssetsData)
+	{
+		TArray<FString> AssetReferencers;
+		UEditorAssetLibrary::FindPackageReferencersForAsset(SelectedAssetData.GetObjectPathString(), false);
+		if (AssetReferencers.Num() == 0)
+		{
+			// The current asset has NO assets referencing it. Add it to the "Unused" asset data list
+			UnusedAssetsData.Add(SelectedAssetData);
+		}
+	}
+	*/
+	
+	FAssetRegistryModule& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(AssetRegistryConstants::ModuleName);
+	for (const FAssetData& SelectedAssetData : SelectedAssetsData)
+	{
+		TArray<FName> AssetDependencies;
+		AssetRegistry.Get().GetDependencies(SelectedAssetData.PackageName, AssetDependencies);
+		if (AssetDependencies.Num() == 0)
+		{
+			UnusedAssetsData.Add(SelectedAssetData);
+		}
+	}
+
+	if (UnusedAssetsData.Num() == 0)
+	{
+		ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused assets found among selected assets"), false);
+		return;
+	}
+
+	// At least one unused asset has been found
+
+	// Note: We CAN use the UEditorAssetLibrary DeleteAsset functions, but they are FORCE deletes without any user confirmation
+	const int32 NumAssetsDeleted = ObjectTools::DeleteAssets(UnusedAssetsData, true);
+	if (NumAssetsDeleted == 0)
+	{
+		// No assets were deleted
+		return;
+	}
+
+	// At least one asset was deleted
+	ShowNotifyInfo(TEXT("Successfully deleted ") + FString::FromInt(NumAssetsDeleted) + " unused assets.");
 }
