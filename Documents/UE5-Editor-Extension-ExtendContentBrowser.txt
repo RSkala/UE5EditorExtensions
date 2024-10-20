@@ -1,0 +1,46 @@
+=============================================
+EXTEND CONTENT BROWSER
+
+=============================================
+
+-------------------------------------------
+Menu Entries
+
+How do Menu Entries work?
+* Delegates
+
+Example:
+Content Browser -> Right-click -> Delete
+
+Delegate: DeleteButtonClicked
+Member Function: OnDeleteButtonClicked()
+
+-------------------------------------------
+Delegates
+* Can call member functions on C++ objects
+* Once BOUND TO functions, functions can be called at a future time
+* BINDING
+
+Different Types of Delegates:
+* Single
+* Multicast
+* Dynamic
+
+Delegates Reference
+https://dev.epicgames.com/documentation/en-us/unreal-engine/delegates-and-lamba-functions-in-unreal-engine?application_version=5.4
+
+In this project, we will mostly be dealing with Single 
+
+How Delelgates are Declared
+DECLARE_DELEGATE(DelegateName)
+* OnDeleteButtonClicked 
+* void Function()
+
+DECLARE_DELEGATE_OneParam(DelegateName, Param1Type)
+* OnDeleteButtonClicked int32
+* void Function(Param1)
+
+DECLARE_DELEGATE_RetVal_OneParam(RetValType, DelegateName, Param1Type)
+* bool OnDeleteButtonClicked int32
+* <RetValType> Function(Param1)
+-------------------------------------------
