@@ -85,5 +85,14 @@ TSharedPtr<FAssetData> AssetDataSharedPtr = MakeShared<FAssetData>(AssetData);
 MakeShared() is more efficient than MakeSharable()
 
 
-======================================
+====================================================
 What We Want to Achieve Using Slate Widgets
+
+Requests:
+* A custom editor tab for displaying assets
+* Displaying assets in a list view
+* Asset list condition can be specified
+* Be able to delete assets directly from the list
+* Can go to where asset is located after clicking it in the list
+
+====================================================
