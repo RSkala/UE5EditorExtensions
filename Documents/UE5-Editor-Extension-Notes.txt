@@ -222,6 +222,24 @@ TMap<UClass, FString> PrefixMap
 * PrefixMap.Find(SelectedObject->GetClass())
 * A TMap is a list of TPair<> objects!
 
+----
+Special case for Materials / Material Instance / Material Instance Constant
 
+NOTE: MaterialInstance is actually an abstract class.
+A Material Instance is really UMaterialInstanceConstant
+
+          // Handle special case for MaterialInstance assets
+          if (SelectedAsset->IsA<UMaterialInstanceConstant>())
+          {
+            if (OldName.StartsWith("M_"))
+            {
+              OldName.RemoveFromStart("M_");
+            }
+
+            if (OldName.EndsWith("_Inst"))
+            {
+              OldName.RemoveFromEnd("_Inst");
+            }
+          }
 
 ========================================================

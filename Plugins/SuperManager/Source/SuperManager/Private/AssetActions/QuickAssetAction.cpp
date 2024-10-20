@@ -148,11 +148,28 @@ void UQuickAssetAction::AddPrefixes()
 				else
 				{
 					// Now, we have found a prefix AND the asset does not have the appropriate prefix
+
+					// Handle special case for MaterialInstance assets
+					if (SelectedAsset->IsA<UMaterialInstanceConstant>())
+					{
+						if (OldName.StartsWith("M_"))
+						{
+							OldName.RemoveFromStart("M_");
+						}
+
+						if (OldName.EndsWith("_Inst"))
+						{
+							OldName.RemoveFromEnd("_Inst");
+						}
+					}
+
+					// Create the new name using the appropriate prefix prepended to the old name
 					const FString NewNameWithPrefix = *FoundPrefix + OldName;
 
 					// Rename the asset
 					UEditorUtilityLibrary::RenameAsset(SelectedAsset, NewNameWithPrefix);
 
+					// Increment counter
 					++Counter;
 				}
 			}
