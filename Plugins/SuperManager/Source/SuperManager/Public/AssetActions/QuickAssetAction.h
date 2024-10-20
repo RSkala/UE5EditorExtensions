@@ -49,6 +49,9 @@ private:
 	UFUNCTION(CallInEditor, meta = (AllowPrivateAccess = true))
 	void RemoveUnusedAssets();
 
+	//UFUNCTION(CallInEditor, meta = (AllowPrivateAccess = true))
+	void FixUpRedirectors();
+
 private:
 	TMap<UClass*, FString> PrefixMap =
 	{

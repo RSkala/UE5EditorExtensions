@@ -3,6 +3,8 @@
 #include "AssetActions/QuickAssetAction.h"
 
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetToolsModule.h"
+#include "AssetViewUtils.h"
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "EditorAssetLibrary.h"
@@ -190,6 +192,9 @@ void UQuickAssetAction::RemoveUnusedAssets()
 	TArray<FAssetData> SelectedAssetsData = UEditorUtilityLibrary::GetSelectedAssetData();
 	TArray<FAssetData> UnusedAssetsData;
 
+	// First, fix up Redirectors
+	FixUpRedirectors();
+
 	// NOTE: This does NOT work in UE5.4. The standard delete dialog appears.
 	/*
 	for (const FAssetData& SelectedAssetData : SelectedAssetsData)
@@ -233,4 +238,56 @@ void UQuickAssetAction::RemoveUnusedAssets()
 
 	// At least one asset was deleted
 	ShowNotifyInfo(TEXT("Successfully deleted ") + FString::FromInt(NumAssetsDeleted) + " unused assets.");
+}
+
+void UQuickAssetAction::FixUpRedirectors()
+{
+	//FAssetRegistryModule& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(AssetRegistryConstants::ModuleName);
+	IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(AssetRegistryConstants::ModuleName).Get();
+
+	// Create an Asset Registry Filter from the paths
+	FARFilter ARFilter;
+	ARFilter.bRecursivePaths = true;
+	ARFilter.PackagePaths.Emplace("/Game");
+
+	ARFilter.ClassPaths.Add(UObjectRedirector::StaticClass()->GetClassPathName());
+
+	// Query for a list of assets in the selected paths
+	TArray<FAssetData> AssetList;
+	AssetRegistry.GetAssets(ARFilter, AssetList);
+
+	if (AssetList.Num() == 0)
+	{
+		return;
+	}
+
+	TArray<FString> ObjectPaths;
+	for (const FAssetData& Asset : AssetList)
+	{
+		ObjectPaths.Add(Asset.GetObjectPathString());
+	}
+
+	TArray<UObject*> Objects;
+	const bool bAllowToPromptToLoadAssets = true;
+	const bool bLoadRedirects = true;
+
+	AssetViewUtils::FLoadAssetsSettings LoadAssetsSettings;
+	LoadAssetsSettings.bFollowRedirectors = false;
+	LoadAssetsSettings.bAllowCancel = true;
+
+	AssetViewUtils::ELoadAssetsResult LoadAssetsResult = AssetViewUtils::LoadAssetsIfNeeded(ObjectPaths, Objects, LoadAssetsSettings);
+
+	if (LoadAssetsResult != AssetViewUtils::ELoadAssetsResult::Cancelled)
+	{
+		// Transform Objects array to ObjectRedirectors array
+		TArray<UObjectRedirector*> RedirectorsToFix;
+		for (UObject* Object : Objects)
+		{
+			RedirectorsToFix.Add(CastChecked<UObjectRedirector>(Object));
+		}
+
+		// Load the asset tools module (used for fixing up the Redirectors)
+		FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
+		AssetToolsModule.Get().FixupReferencers(RedirectorsToFix);
+	}
 }

@@ -4,6 +4,10 @@ Unreal Engine 5 Editor Extensions
 ===================================
 
 ======================================================
+QUICK ASSET ACTIONS
+======================================================
+
+======================================================
 ---------------------------------------
 MODULES:
 * Modules are basically building blocks for the ending
@@ -278,6 +282,23 @@ In order to delete unused assets, you need to use the AssetRegistry:
       UnusedAssetsData.Add(SelectedAssetData);
     }
   }
+
+========================================================
+FIX UP REDIRECTORS
+
+NOTE: Since UE5.4, the method has changed:
+https://www.udemy.com/course/unrealengine5-c-one-course-solution-for-extending-editor/learn/lecture/33815162#questions/20825478
+
+We need to include the Module:
+AssetToolsModule
+
+And need to call
+FixUpReferencers
+
+Includes:
+#include "AssetToolsModule.h"
+#include "AssetViewUtils.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 
 ========================================================
 

@@ -30,7 +30,8 @@ public class SuperManager : ModuleRules
 				"UnrealEd",
 				"EditorScriptingUtilities",
 				"UMG",
-				"Niagara"
+				"Niagara",
+				"AssetTools"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
