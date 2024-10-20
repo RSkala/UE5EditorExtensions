@@ -300,5 +300,8 @@ Includes:
 #include "AssetViewUtils.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 
+In order to use AssetToolsModule, must be added to Build.cs:
+"AssetTools"
+
 ========================================================
 
