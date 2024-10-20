@@ -122,3 +122,45 @@ void UQuickAssetAction::PrintViewportAspectRatio()
 		}
 	}
 }
+
+void UQuickAssetAction::AddPrefixes()
+{
+	TArray<UObject*> SelectedAssets = UEditorUtilityLibrary::GetSelectedAssets();
+	uint32 Counter = 0;
+
+	for (UObject* SelectedAsset : SelectedAssets)
+	{
+		if (SelectedAsset != nullptr)
+		{
+			FString* FoundPrefix = PrefixMap.Find(SelectedAsset->GetClass());
+			if (FoundPrefix == nullptr || FoundPrefix->IsEmpty())
+			{
+				// This means we do not have a pre-set value for this class
+				Print(TEXT("Failed to find prefix for class ") + SelectedAsset->GetClass()->GetName(), FColor::Red);
+			}
+			else
+			{
+				FString OldName = SelectedAsset->GetName();
+				if (OldName.StartsWith(*FoundPrefix))
+				{
+					Print(OldName + TEXT(" already has prefix added"), FColor::Red);
+				}
+				else
+				{
+					// Now, we have found a prefix AND the asset does not have the appropriate prefix
+					const FString NewNameWithPrefix = *FoundPrefix + OldName;
+
+					// Rename the asset
+					UEditorUtilityLibrary::RenameAsset(SelectedAsset, NewNameWithPrefix);
+
+					++Counter;
+				}
+			}
+		}
+	}
+
+	if (Counter > 0)
+	{
+		ShowNotifyInfo(TEXT("Successfully renamed ") + FString::FromInt(Counter) + " assets");
+	}
+}

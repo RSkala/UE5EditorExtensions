@@ -206,4 +206,22 @@ void ShowNotifyInfo(const FString& Message)
 
 
 ========================================================
+ASSET NAMING CONVENTIONS / ASSET PREFIXES
 
+Epic's Official Asset Naming Conventions:
+https://dev.epicgames.com/documentation/en-us/unreal-engine/recommended-asset-naming-conventions-in-unreal-engine-projects?application_version=5.4
+
+Functions we will use:
+UEditorUtilityLibrary::RenameAsset()
+
+TArray<FString> PrefixArray 
+* Too slow for our purposes (O(n))
+
+TMap<UClass, FString> PrefixMap
+* This is what we will use --- fast lookup
+* PrefixMap.Find(SelectedObject->GetClass())
+* A TMap is a list of TPair<> objects!
+
+
+
+========================================================
