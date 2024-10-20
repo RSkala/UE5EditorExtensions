@@ -7,6 +7,7 @@
 #include "EditorAssetLibrary.h"
 #include "EditorUtilityLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/MessageDialog.h"
 
 #include "DebugHeader.h"
 
@@ -20,7 +21,7 @@ void UQuickAssetAction::DuplicateAssets(int32 NumOfDuplicates)
 {
 	if (NumOfDuplicates <= 0)
 	{
-		Print(TEXT("Please enter a VALID number"), FColor::Red);
+		ShowMsgDialog(EAppMsgType::Ok, TEXT("Please enter a VALID number"));
 		return;
 	}
 
@@ -55,11 +56,7 @@ void UQuickAssetAction::DuplicateAssets(int32 NumOfDuplicates)
 
 	if (DuplicatedAssetCounter > 0)
 	{
-		Print(TEXT("Successfully duplicated" + FString::FromInt(DuplicatedAssetCounter) + " asset files."), FColor::Green);
-	}
-	else
-	{
-		Print(TEXT("No assets duplicated"), FColor::Green);
+		ShowNotifyInfo(TEXT("Successfully duplicated" + FString::FromInt(DuplicatedAssetCounter) + " asset files."));
 	}
 }
 

@@ -170,7 +170,40 @@ void DuplicateAssets(int32 NumOfDuplicates);
 Also a popup to enter a string will appear as well:
 void TestCallInEditorString(FString TestString);
 
-
 --------------------------------------------------
 
+========================================================
+CUSTOM EDITOR MESSAGES
+
+FMessageDialog
+FNotificationManager
+
+https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Runtime/Core/Misc/FMessageDialog?application_version=4.27
+
+https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Runtime/Slate/Widgets/Notifications/SNotificationList?application_version=4.27
+
+--------------------------
+FMessageDialog Example:
+    FText MsgTtile = FText::FromString(TEXT("Warning"));
+    FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Please enter a VALID number")), &MsgTtile);
+
+--------------------------
+For success, instead of using a debug message, you can use a "notification" in the lower right corner
+
+#include "Widgets/Notifications/SNotificationList.h"
+#include "Framework/Notifications/NotificationManager.h"
+
+Example usage:
+
+void ShowNotifyInfo(const FString& Message)
+{
+  FNotificationInfo NotifyInfo(FText::FromString(Message));
+  NotifyInfo.bUseLargeFont = true;
+  NotifyInfo.FadeOutDuration = 4.0f;
+
+  FSlateNotificationManager::Get().AddNotification(NotifyInfo);
+}
+
+
+========================================================
 
