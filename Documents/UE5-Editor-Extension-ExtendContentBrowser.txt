@@ -44,3 +44,80 @@ DECLARE_DELEGATE_RetVal_OneParam(RetValType, DelegateName, Param1Type)
 * bool OnDeleteButtonClicked int32
 * <RetValType> Function(Param1)
 -------------------------------------------
+Where To Add Custom Menu Entries?
+
+In your Plugin's <Name>.cpp file, e.g. SuperManager.cpp, there is:
+StartupModule()
+ShutdownModule()
+
+void FSuperManagerModule::StartupModule()
+{
+	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
+}
+
+Steps for Custom Menu Entry:
+* Load ContentBrowser Module (FModuleManager)
+* PathViewContextMenuExtenders
+  -> Add in our own delegate
+  -> Bind to our own member functions
+
+====================================================
+ADD CUSTOM DELEGATE
+
+In StartupModule():
+InitContentBrowserMenuExtension();
+
+void FSuperManagerModule::InitContentBrowserMenuExtension()
+{
+	// Get the ContentBrowserModule so we can add our own custom context menus
+	FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>(TEXT("ContentBrowser"));
+
+	// Get the delegates for extending content browser menus
+	TArray<FContentBrowserMenuExtender_SelectedPaths>& ContentBrowserMenuExtenders = 
+		ContentBrowserModule.GetAllPathViewContextMenuExtenders();
+
+	// Add our own content browser menu delegate
+	FContentBrowserMenuExtender_SelectedPaths CustomContentBrowserMenuDelegate;
+	ContentBrowserMenuExtenders.Add(CustomContentBrowserMenuDelegate);
+}
+
+===========================================
+BINDING FUNCTIONS TO EXTEND CONTENT BROWSER
+
+First Binding:
+* Define the position for inserting menu entry
+
+Second Binding:
+* Define the details for the menu entry (e.g. Tile, Tooltip, Function)
+
+Third Binding:
+* The actual function to execute
+
+-----------------------------
+NOTE:
+* When using the new() keyword in Unreal, you should always use SmartPointers, so you don't get memory leaks
+
+-----------------------------
+
+Extension Hooks:
+To quickly find all the extension hooks:
+* Editor Preferences -> General -> Miscellaneous -> Developer Tools
+* Display UI Extension Points: ENABLE
+
+You will have to restart the Editor in order for this to take effect
+There will then be GREEN text all over the Editor
+These are the Extension Hooks! 
+Note that the Editor gets really messy with this enabled, but is incredibly useful.
+
+For example, if we wanted to delete:
+Right-click, and you can see next to Delete, the green text is "Delete",
+so the ExtensionHook is "Delete".
+
+Note that not all have the same name. For example:
+The ExtensionHook for "Save All" is "SaveAllCurrentFolder"
+
+If you use the wrong ExtensionHook, you will NOT get any error messages. You will just not see your extension.
+
+
+
+====================================================

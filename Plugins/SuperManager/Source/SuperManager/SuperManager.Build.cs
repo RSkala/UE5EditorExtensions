@@ -31,7 +31,8 @@ public class SuperManager : ModuleRules
 				"EditorScriptingUtilities",
 				"UMG",
 				"Niagara",
-				"AssetTools"
+				"AssetTools",
+				"ContentBrowser"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
