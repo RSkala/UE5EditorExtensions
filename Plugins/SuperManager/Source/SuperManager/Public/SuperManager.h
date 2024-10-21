@@ -28,6 +28,9 @@ private:
 	// The function that the Menu Entry will call (the Menu Entry Action) (Third Binding)
 	void OnDeleteUnusedAssetButtonClicked();
 
+	// Delete empty folders
+	void OnDeleteEmptyFolderseButtonClicked();
+
 	void FixUpRedirectors();
 
 private:

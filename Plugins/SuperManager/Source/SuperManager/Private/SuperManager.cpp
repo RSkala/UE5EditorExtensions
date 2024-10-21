@@ -91,12 +91,22 @@ void FSuperManagerModule::AddContentBrowserMenuEntry(FMenuBuilder& MenuBuilder)
 {
 	UE_LOG(LogTemp, Warning, TEXT("FSuperManagerModule::AddContentBrowserMenuEntry"));
 
+	// Delete Unused Assets
 	MenuBuilder.AddMenuEntry
 	(
 		FText::FromString(TEXT("Delete Unused Assets")), // Label / Title text for our menu entry
 		FText::FromString(TEXT("Safely delete all unused assets under folder")), // Tooltip
 		FSlateIcon(), // Custom Icon
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteUnusedAssetButtonClicked) // Actual function to call when our custom Menu Entry is selected
+	);
+
+	// Delete Empty Folderse
+	MenuBuilder.AddMenuEntry
+	(
+		FText::FromString(TEXT("Delete Empty Folders")),
+		FText::FromString(TEXT("Safely delete any empty folders under the selected folder")),
+		FSlateIcon(),
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteEmptyFolderseButtonClicked)
 	);
 }
 
@@ -183,6 +193,114 @@ void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 	{
 		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused assets found under selected folder"), false);
 	}
+}
+
+void FSuperManagerModule::OnDeleteEmptyFolderseButtonClicked()
+{
+	UE_LOG(LogTemp, Warning, TEXT("---------------------------------------------"));
+	UE_LOG(LogTemp, Warning, TEXT("FSuperManagerModule::OnDeleteEmptyFolderseButtonClicked"));
+
+	if (SelectedFolderPaths.Num() != 1)
+	{
+		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("You can only do this to one folder"));
+		return;
+	}
+
+	// Fix up redirectors before attempting to delete folders (as a folder could be empty after deleting redirectors)
+	FixUpRedirectors();
+
+	FString EmptyFolderPathsNames; // for debug messages
+	uint32 Counter = 0;
+
+	// Get all assets INCLUDING paths (last parameter is bIncludeFolder)
+	TArray<FString> FolderPathsArray = UEditorAssetLibrary::ListAssets(SelectedFolderPaths[0], true, true);
+
+	// List of empty paths to delete
+	TArray<FString> EmptyFoldersPathsArray;
+
+	// Iterate through each found asset, check if it is a directory, then check if empty
+	for (const FString& FolderPath : FolderPathsArray)
+	{
+		// Don't touch root folder. Do not delete anything from Collections or Developers folders!
+		if (FolderPath.Contains(TEXT("Collections")) ||
+			FolderPath.Contains(TEXT("Developers")) ||
+			FolderPath.Contains(TEXT("__ExternalActors__")) ||
+			FolderPath.Contains(TEXT("__ExternalObjects__")))
+		{
+			continue;
+		}
+
+		// If the directory does NOT exist, then it is an asset, not a directory. Skip.
+		if (!UEditorAssetLibrary::DoesDirectoryExist(FolderPath))
+		{
+			continue;
+		}
+
+		// Check if directory is empty
+		if (!UEditorAssetLibrary::DoesDirectoryHaveAssets(FolderPath))
+		{
+			EmptyFolderPathsNames.Append(FolderPath);
+			EmptyFolderPathsNames.Append(TEXT("\n"));
+
+			EmptyFoldersPathsArray.Add(FolderPath);
+		}
+	}
+
+	// Did we find any empty folders
+	if (EmptyFoldersPathsArray.Num() == 0)
+	{
+		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("No empty folders found under selected folder"), false);
+		return;
+	}
+	
+	// Show user confirmation
+	EAppReturnType::Type ConfirmResult = DebugHeader::ShowMsgDialog(
+		EAppMsgType::OkCancel,
+		TEXT("Empty folders found in:\n") + EmptyFolderPathsNames + TEXT("\nWould you like to delete all?"),
+		false);
+
+	if (ConfirmResult == EAppReturnType::Cancel)
+	{
+		return;
+	}
+
+	for (const FString& EmptyFolderPath : EmptyFoldersPathsArray)
+	{
+		if (UEditorAssetLibrary::DeleteDirectory(EmptyFolderPath))
+		{
+			++Counter;
+		}
+		else
+		{
+			DebugHeader::Print(TEXT("Failed to delete " + EmptyFolderPath), FColor::Red);
+		}
+	}
+
+	if (Counter > 0)
+	{
+		DebugHeader::ShowNotifyInfo(TEXT("Successfully deleted ") + FString::FromInt(Counter) + TEXT(" folders."));
+	}
+
+	// ===============================================
+
+	// Get the Asset Registry in order to access folders
+	//IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(AssetRegistryConstants::ModuleName).Get();
+
+	// Get all the paths in the content browser / asset registry
+	// NOTE: // This gets ALL paths in the project, including ones under Engine, etc!
+	/*TArray<FString> CachedPaths;
+	//AssetRegistry.GetAllCachedPaths(CachedPaths); 
+	UE_LOG(LogTemp, Log, TEXT("Cached Paths:"));
+	for (FString CachedPath : CachedPaths)
+	{
+		UE_LOG(LogTemp, Log, TEXT(" - %s"), *CachedPath);
+	}*/
+
+	// Get all subpaths to the selected path (recursively)
+	//TArray<FString> SubPaths;
+	//AssetRegistry.GetSubPaths(SelectedFolderPaths[0], SubPaths, true);
+
+	//ObjectTools
 }
 
 void FSuperManagerModule::FixUpRedirectors()

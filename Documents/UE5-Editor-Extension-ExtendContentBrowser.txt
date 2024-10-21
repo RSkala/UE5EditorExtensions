@@ -132,4 +132,16 @@ NOTE:
 IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(AssetRegistryConstants::ModuleName).Get();
 
 ====================================================
+DELETE EMPTY FOLDERS
 
+Steps:
+* List out all the assets including directions
+* Pick out only directories
+* Query if directory has assets
+
+TArray<FString> FolderPathsArray = UEditorAssetLibrary::ListAssets(SelectedFolderPaths[0], true, true);
+UEditorAssetLibrary::DoesDirectoryExist
+UEditorAssetLibrary::DoesDirectoryHaveAssets
+UEditorAssetLibrary::DeleteDirectory(EmptyFolderPath)
+
+====================================================
