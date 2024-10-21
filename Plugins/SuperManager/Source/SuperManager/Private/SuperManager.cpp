@@ -3,6 +3,8 @@
 #include "SuperManager.h"
 
 #include "ContentBrowserModule.h"
+#include "EditorAssetLibrary.h"
+#include "ObjectTools.h"
 
 #include "DebugHeader.h"
 
@@ -53,6 +55,8 @@ void FSuperManagerModule::InitContentBrowserMenuExtension()
 
 TSharedRef<FExtender> FSuperManagerModule::CustomContentBrowserMenuExtender(const TArray<FString>& SelectedPaths)
 {
+	UE_LOG(LogTemp, Warning, TEXT("FSuperManagerModule::CustomContentBrowserMenuExtender - NumSelectedPaths: %d"), SelectedPaths.Num());
+
 	// Reminder: TSharedRef CANNOT point to null (must be a valid object)
 
 	TSharedRef<FExtender>MenuExtender(new FExtender()); // When using new() in UE, be sure to always use SmartPointers to avoid memory leaks
@@ -70,6 +74,9 @@ TSharedRef<FExtender> FSuperManagerModule::CustomContentBrowserMenuExtender(cons
 			EExtensionHook::After, // Extension position
 			TSharedPtr<FUICommandList>(), // Custom HotKeys to trigger this (here, using "empty")
 			FMenuExtensionDelegate::CreateRaw(this, &FSuperManagerModule::AddContentBrowserMenuEntry)); // Delegate called to populate the menu
+
+		// Set the selected paths
+		SelectedFolderPaths = SelectedPaths;
 	}
 
 	return MenuExtender;
@@ -77,6 +84,8 @@ TSharedRef<FExtender> FSuperManagerModule::CustomContentBrowserMenuExtender(cons
 
 void FSuperManagerModule::AddContentBrowserMenuEntry(FMenuBuilder& MenuBuilder)
 {
+	UE_LOG(LogTemp, Warning, TEXT("FSuperManagerModule::AddContentBrowserMenuEntry"));
+
 	MenuBuilder.AddMenuEntry
 	(
 		FText::FromString(TEXT("Delete Unused Assets")), // Label / Title
@@ -88,7 +97,71 @@ void FSuperManagerModule::AddContentBrowserMenuEntry(FMenuBuilder& MenuBuilder)
 
 void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("FSuperManagerModule::OnDeleteUnusedAssetButtonClicked"));
+	//UE_LOG(LogTemp, Warning, TEXT("FSuperManagerModule::OnDeleteUnusedAssetButtonClicked"));
+	DebugHeader::Print(TEXT("OnDeleteUnusedAssetButtonClicked"), FColor::Green);
+
+	// ListAssets
+
+	if (SelectedFolderPaths.Num() == 0)
+	{
+		return;
+	}
+
+	if (SelectedFolderPaths.Num() > 1)
+	{
+		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("You can only do this to one folder"));
+		return;
+	}
+
+	DebugHeader::Print(TEXT("Currently selected folder: ") + SelectedFolderPaths[0], FColor::Green);
+
+	TArray<FString> AssetsPathsNames = UEditorAssetLibrary::ListAssets(SelectedFolderPaths[0]);
+	if (AssetsPathsNames.Num() == 0)
+	{
+		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("No assets found under selected folder"));
+		return;
+	}
+
+	EAppReturnType::Type ConfirmResult = 
+		DebugHeader::ShowMsgDialog(
+			EAppMsgType::YesNo,
+			TEXT("A total of ") + FString::FromInt(AssetsPathsNames.Num()) + TEXT(" assets found.\n\nWould you like to proceed?"));
+
+	if (ConfirmResult == EAppReturnType::No)
+	{
+		return;
+	}
+
+	TArray<FAssetData> UnusedAssetsDataArray;
+	for (const FString& AssetPathName : AssetsPathsNames)
+	{
+		// Don't touch root folder. Do not delete anything from Collections or Develops folders!
+		if (AssetPathName.Contains(TEXT("Collections")) || AssetPathName.Contains(TEXT("Collections")))
+		{
+			continue;
+		}
+
+		if (!UEditorAssetLibrary::DoesAssetExist(AssetPathName))
+		{
+			continue;
+		}
+
+		TArray<FString> AssetReferencers = UEditorAssetLibrary::FindPackageReferencersForAsset(AssetPathName);
+		if (AssetReferencers.Num() == 0)
+		{
+			const FAssetData UnusedAssetData = UEditorAssetLibrary::FindAssetData(AssetPathName);
+			UnusedAssetsDataArray.Add(UnusedAssetData);
+		}
+	}
+
+	if (UnusedAssetsDataArray.Num() > 0)
+	{
+		ObjectTools::DeleteAssets(UnusedAssetsDataArray);
+	}
+	else
+	{
+		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused assets found under selected folder"));
+	}
 }
 
 #pragma endregion // ContentBrowserMenuExtension

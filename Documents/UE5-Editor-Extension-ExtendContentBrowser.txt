@@ -85,7 +85,8 @@ void FSuperManagerModule::InitContentBrowserMenuExtension()
 BINDING FUNCTIONS TO EXTEND CONTENT BROWSER
 
 First Binding:
-* Define the position for inserting menu entry
+* Define the function that is called when the menu is brought up
+* For example, when the user right-clicks a folder in the Content Browser, the functions bound to ContentBrowserModule.GetAllPathViewContextMenuExtenders() will be called
 
 Second Binding:
 * Define the details for the menu entry (e.g. Tile, Tooltip, Function)
@@ -118,6 +119,17 @@ The ExtensionHook for "Save All" is "SaveAllCurrentFolder"
 
 If you use the wrong ExtensionHook, you will NOT get any error messages. You will just not see your extension.
 
+====================================================
+DELETE UNUSED ASSETS
 
+Some functions to use:
+* TArray<FString> AssetsPathsNames = UEditorAssetLibrary::ListAssets(SelectedFolderPaths[0]);
+* UEditorAssetLibrary::DoesAssetExist(AssetPathName)
+* ObjectTools::DeleteAssets(UnusedAssetsDataArray);
+
+NOTE:
+* Maybe can also use AssetRegistry:
+IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(AssetRegistryConstants::ModuleName).Get();
 
 ====================================================
+

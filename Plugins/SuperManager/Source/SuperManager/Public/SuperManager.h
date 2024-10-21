@@ -28,5 +28,8 @@ private:
 	// The function that the Menu Entry will call (the Menu Entry Action) (Third Binding)
 	void OnDeleteUnusedAssetButtonClicked();
 
+private:
+	TArray<FString> SelectedFolderPaths;
+
 #pragma endregion // ContentBrowserMenuExtension
 };
