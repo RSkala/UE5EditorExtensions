@@ -2,6 +2,9 @@
 
 #include "SuperManager.h"
 
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetToolsModule.h"
+#include "AssetViewUtils.h"
 #include "ContentBrowserModule.h"
 #include "EditorAssetLibrary.h"
 #include "ObjectTools.h"
@@ -132,6 +135,10 @@ void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 		return;
 	}
 
+	// Fix up Redirectors BEFORE deleting unused assets
+	FixUpRedirectors();
+
+	// Iterate through the found assets
 	TArray<FAssetData> UnusedAssetsDataArray;
 	for (const FString& AssetPathName : AssetsPathsNames)
 	{
@@ -161,6 +168,64 @@ void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 	else
 	{
 		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused assets found under selected folder"));
+	}
+}
+
+void FSuperManagerModule::FixUpRedirectors()
+{
+	// COPY PASTED (with some slight modifications):
+	// From UQuickAssetAction::FixUpRedirectors()
+
+	// Get the AssetRegistry in order to delete redirectors
+	IAssetRegistry& AssetRegistry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(AssetRegistryConstants::ModuleName).Get();
+
+	// Create an Asset Registry Filter from the paths
+	FARFilter ARFilter;
+	ARFilter.bRecursivePaths = true;
+	ARFilter.PackagePaths.Emplace("/Game");
+	ARFilter.ClassPaths.Add(UObjectRedirector::StaticClass()->GetClassPathName());
+
+	// Query for a list of assets in the selected paths
+	TArray<FAssetData> RedirectorAssetList;
+	AssetRegistry.GetAssets(ARFilter, RedirectorAssetList);
+
+	// Exit if no Redirector assets were found
+	if (RedirectorAssetList.Num() == 0)
+	{
+		return;
+	}
+
+	// Get all the Redirector asset paths
+	TArray<FString> RedirectorObjectPaths;
+	for (const FAssetData& RedirectorAsset : RedirectorAssetList)
+	{
+		RedirectorObjectPaths.Add(RedirectorAsset.GetObjectPathString());
+	}
+
+	// Create LoadAssetsSettings 
+	AssetViewUtils::FLoadAssetsSettings LoadAssetsSettings;
+	LoadAssetsSettings.bFollowRedirectors = false;
+	LoadAssetsSettings.bAllowCancel = true;
+
+	// Array of Redirector objects that will be loaded in order for fixup
+	TArray<UObject*> RedirectorObjects;
+
+	// Load Redirector objects for fixup
+	AssetViewUtils::ELoadAssetsResult LoadAssetsResult = AssetViewUtils::LoadAssetsIfNeeded(RedirectorObjectPaths, RedirectorObjects, LoadAssetsSettings);
+
+	// If the user confirmed fixup, then apply the fixup redirector action
+	if (LoadAssetsResult != AssetViewUtils::ELoadAssetsResult::Cancelled)
+	{
+		// Transform Objects array to ObjectRedirectors array
+		TArray<UObjectRedirector*> RedirectorsToFix;
+		for (UObject* RedirectorObject : RedirectorObjects)
+		{
+			RedirectorsToFix.Add(CastChecked<UObjectRedirector>(RedirectorObject));
+		}
+
+		// Load the asset tools module (used for fixing up the Redirectors)
+		FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
+		AssetToolsModule.Get().FixupReferencers(RedirectorsToFix);
 	}
 }
 

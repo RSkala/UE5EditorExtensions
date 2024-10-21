@@ -28,6 +28,8 @@ private:
 	// The function that the Menu Entry will call (the Menu Entry Action) (Third Binding)
 	void OnDeleteUnusedAssetButtonClicked();
 
+	void FixUpRedirectors();
+
 private:
 	TArray<FString> SelectedFolderPaths;
 
