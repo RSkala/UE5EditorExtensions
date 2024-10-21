@@ -4,6 +4,8 @@
 
 #include "ContentBrowserModule.h"
 
+#include "DebugHeader.h"
+
 #define LOCTEXT_NAMESPACE "FSuperManagerModule"
 
 void FSuperManagerModule::StartupModule()

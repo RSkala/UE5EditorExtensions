@@ -5,7 +5,7 @@
 #include "Widgets/Notifications/SNotificationList.h"
 
 
-void Print(const FString& Message, const FColor& Color)
+static void Print(const FString& Message, const FColor& Color)
 {
 	if (GEngine != nullptr)
 	{
@@ -13,12 +13,12 @@ void Print(const FString& Message, const FColor& Color)
 	}
 }
 
-void PrintLog(const FString& Message)
+static void PrintLog(const FString& Message)
 {
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Message);
 }
 
-EAppReturnType::Type ShowMsgDialog(EAppMsgType::Type MsgType, const FString& Message, bool bShowMsgAsWarning = true)
+static EAppReturnType::Type ShowMsgDialog(EAppMsgType::Type MsgType, const FString& Message, bool bShowMsgAsWarning = true)
 {
 	if (bShowMsgAsWarning)
 	{
@@ -33,7 +33,7 @@ EAppReturnType::Type ShowMsgDialog(EAppMsgType::Type MsgType, const FString& Mes
 	}
 }
 
-void ShowNotifyInfo(const FString& Message)
+static void ShowNotifyInfo(const FString& Message)
 {
 	FNotificationInfo NotifyInfo(FText::FromString(Message));
 	NotifyInfo.bUseLargeFont = true;
