@@ -56,6 +56,7 @@ void FSuperManagerModule::InitContentBrowserMenuExtension()
 		FContentBrowserMenuExtender_SelectedPaths::CreateRaw(this, &FSuperManagerModule::CustomContentBrowserMenuExtender));
 }
 
+// Define the location of our custom menu entry. This is called EACH time the Right-click -> Content Browser menu is opened
 TSharedRef<FExtender> FSuperManagerModule::CustomContentBrowserMenuExtender(const TArray<FString>& SelectedPaths)
 {
 	UE_LOG(LogTemp, Warning, TEXT("FSuperManagerModule::CustomContentBrowserMenuExtender - NumSelectedPaths: %d"), SelectedPaths.Num());
@@ -73,10 +74,10 @@ TSharedRef<FExtender> FSuperManagerModule::CustomContentBrowserMenuExtender(cons
 		//   * Display UI Extension Points: ENABLE
 
 		MenuExtender->AddMenuExtension(
-			FName("Delete"), // ExtensionHook
-			EExtensionHook::After, // Extension position
+			FName("Delete"), // ExtensionHook, position to insert our menu entry. This MUST exist.
+			EExtensionHook::After, // Extension position, before or after the above ExtensionHook
 			TSharedPtr<FUICommandList>(), // Custom HotKeys to trigger this (here, using "empty")
-			FMenuExtensionDelegate::CreateRaw(this, &FSuperManagerModule::AddContentBrowserMenuEntry)); // Delegate called to populate the menu
+			FMenuExtensionDelegate::CreateRaw(this, &FSuperManagerModule::AddContentBrowserMenuEntry)); // Delegate called to populate abd define the details of our the menu
 
 		// Set the selected paths
 		SelectedFolderPaths = SelectedPaths;
@@ -85,13 +86,14 @@ TSharedRef<FExtender> FSuperManagerModule::CustomContentBrowserMenuExtender(cons
 	return MenuExtender;
 }
 
+// Defining the details of our custom menu entry
 void FSuperManagerModule::AddContentBrowserMenuEntry(FMenuBuilder& MenuBuilder)
 {
 	UE_LOG(LogTemp, Warning, TEXT("FSuperManagerModule::AddContentBrowserMenuEntry"));
 
 	MenuBuilder.AddMenuEntry
 	(
-		FText::FromString(TEXT("Delete Unused Assets")), // Label / Title
+		FText::FromString(TEXT("Delete Unused Assets")), // Label / Title text for our menu entry
 		FText::FromString(TEXT("Safely delete all unused assets under folder")), // Tooltip
 		FSlateIcon(), // Custom Icon
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteUnusedAssetButtonClicked) // Actual function to call when our custom Menu Entry is selected
@@ -102,8 +104,6 @@ void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("FSuperManagerModule::OnDeleteUnusedAssetButtonClicked"));
 	DebugHeader::Print(TEXT("OnDeleteUnusedAssetButtonClicked"), FColor::Green);
-
-	// ListAssets
 
 	if (SelectedFolderPaths.Num() == 0)
 	{
@@ -118,18 +118,23 @@ void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 
 	DebugHeader::Print(TEXT("Currently selected folder: ") + SelectedFolderPaths[0], FColor::Green);
 
-	TArray<FString> AssetsPathsNames = UEditorAssetLibrary::ListAssets(SelectedFolderPaths[0]);
+	// Get ALL the assets under the selected folder
+	TArray<FString> AssetsPathsNames = UEditorAssetLibrary::ListAssets(SelectedFolderPaths[0], true, false);
+
+	// Exit if there are no assets under the selected folder
 	if (AssetsPathsNames.Num() == 0)
 	{
-		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("No assets found under selected folder"));
+		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("No assets found under selected folder"), false);
 		return;
 	}
 
+	// Show confirmation dialog to the user in order to proceed
 	EAppReturnType::Type ConfirmResult = 
 		DebugHeader::ShowMsgDialog(
 			EAppMsgType::YesNo,
-			TEXT("A total of ") + FString::FromInt(AssetsPathsNames.Num()) + TEXT(" assets found.\n\nWould you like to proceed?"));
+			TEXT("A total of ") + FString::FromInt(AssetsPathsNames.Num()) + TEXT(" assets need to be checked.\n\nWould you like to proceed?"), false);
 
+	// Exit if the user does not wish to proceed (i.e. selected "No" in the dialog box)
 	if (ConfirmResult == EAppReturnType::No)
 	{
 		return;
@@ -138,36 +143,45 @@ void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
 	// Fix up Redirectors BEFORE deleting unused assets
 	FixUpRedirectors();
 
-	// Iterate through the found assets
+	// List of assets to be deleted
 	TArray<FAssetData> UnusedAssetsDataArray;
+
+	// Iterate through the assets found under the selected folder and add to the "unused assets" list
 	for (const FString& AssetPathName : AssetsPathsNames)
 	{
-		// Don't touch root folder. Do not delete anything from Collections or Develops folders!
-		if (AssetPathName.Contains(TEXT("Collections")) || AssetPathName.Contains(TEXT("Collections")))
+		// Don't touch root folder. Do not delete anything from Collections or Developers folders!
+		if (AssetPathName.Contains(TEXT("Collections")) ||
+			AssetPathName.Contains(TEXT("Developers")) ||
+			AssetPathName.Contains(TEXT("__ExternalActors__")) ||
+			AssetPathName.Contains(TEXT("__ExternalObjects__")))
 		{
 			continue;
 		}
 
+		// Ensure the asset exists (possibly removed when fixing up redirectors?)
 		if (!UEditorAssetLibrary::DoesAssetExist(AssetPathName))
 		{
 			continue;
 		}
 
+		// Get all referencers to the current asset
 		TArray<FString> AssetReferencers = UEditorAssetLibrary::FindPackageReferencersForAsset(AssetPathName);
 		if (AssetReferencers.Num() == 0)
 		{
+			// There are NO referencers to the current asset. Add to the list of assets to be deleted.
 			const FAssetData UnusedAssetData = UEditorAssetLibrary::FindAssetData(AssetPathName);
 			UnusedAssetsDataArray.Add(UnusedAssetData);
 		}
 	}
 
+	// If there are any elements in the "unused assets" array, delete them
 	if (UnusedAssetsDataArray.Num() > 0)
 	{
 		ObjectTools::DeleteAssets(UnusedAssetsDataArray);
 	}
 	else
 	{
-		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused assets found under selected folder"));
+		DebugHeader::ShowMsgDialog(EAppMsgType::Ok, TEXT("No unused assets found under selected folder"), false);
 	}
 }
 
