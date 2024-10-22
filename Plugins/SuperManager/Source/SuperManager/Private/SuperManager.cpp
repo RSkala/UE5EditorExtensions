@@ -100,13 +100,22 @@ void FSuperManagerModule::AddContentBrowserMenuEntry(FMenuBuilder& MenuBuilder)
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteUnusedAssetButtonClicked) // Actual function to call when our custom Menu Entry is selected
 	);
 
-	// Delete Empty Folderse
+	// Delete Empty Folders
 	MenuBuilder.AddMenuEntry
 	(
 		FText::FromString(TEXT("Delete Empty Folders")),
 		FText::FromString(TEXT("Safely delete any empty folders under the selected folder")),
 		FSlateIcon(),
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnDeleteEmptyFolderseButtonClicked)
+	);
+
+	// Advanced asset deletion
+	MenuBuilder.AddMenuEntry
+	(
+		FText::FromString(TEXT("Advanced Deletion")),
+		FText::FromString(TEXT("List assets by specific condition in a tab for deleting")),
+		FSlateIcon(),
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnAdvancedDeletionButtonClicked)
 	);
 }
 
@@ -301,6 +310,14 @@ void FSuperManagerModule::OnDeleteEmptyFolderseButtonClicked()
 	//AssetRegistry.GetSubPaths(SelectedFolderPaths[0], SubPaths, true);
 
 	//ObjectTools
+}
+
+void FSuperManagerModule::OnAdvancedDeletionButtonClicked()
+{
+	UE_LOG(LogTemp, Warning, TEXT("---------------------------------------------"));
+	UE_LOG(LogTemp, Warning, TEXT("FSuperManagerModule::OnDeleteEmptyFolderseButtonClicked"));
+
+
 }
 
 void FSuperManagerModule::FixUpRedirectors()

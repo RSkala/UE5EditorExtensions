@@ -31,6 +31,8 @@ private:
 	// Delete empty folders
 	void OnDeleteEmptyFolderseButtonClicked();
 
+	void OnAdvancedDeletionButtonClicked();
+
 	void FixUpRedirectors();
 
 private:
