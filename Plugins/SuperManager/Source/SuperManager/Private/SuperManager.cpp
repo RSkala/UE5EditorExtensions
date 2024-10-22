@@ -8,6 +8,8 @@
 #include "ContentBrowserModule.h"
 #include "EditorAssetLibrary.h"
 #include "ObjectTools.h"
+#include "Slate/SceneViewport.h"
+#include "Widgets/SViewport.h"
 
 #include "DebugHeader.h"
 #include "SlateWidgets/AdvancedDeletionWidget.h"
@@ -25,6 +27,9 @@ void FSuperManagerModule::StartupModule()
 
 	// Initialize our Custom Tab
 	RegisterAdvancedDeletionTab();
+
+	// Initialize test viewport tab
+	//RegisterTestViewportTab();
 }
 
 void FSuperManagerModule::ShutdownModule()
@@ -120,6 +125,15 @@ void FSuperManagerModule::AddContentBrowserMenuEntry(FMenuBuilder& MenuBuilder)
 		FText::FromString(TEXT("List assets by specific condition in a tab for deleting")),
 		FSlateIcon(),
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnAdvancedDeletionButtonClicked)
+	);
+
+	// Test viewport tab
+	MenuBuilder.AddMenuEntry
+	(
+		FText::FromString(TEXT("Test Viewport Window")),
+		FText::FromString(TEXT("Create a new tab window with a viewport inside")),
+		FSlateIcon(),
+		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnTestViewportTabButtonClicked)
 	);
 }
 
@@ -323,6 +337,11 @@ void FSuperManagerModule::OnAdvancedDeletionButtonClicked()
 	FGlobalTabmanager::Get()->TryInvokeTab(FName("AdvancedDeletion"));
 }
 
+void FSuperManagerModule::OnTestViewportTabButtonClicked()
+{
+	FGlobalTabmanager::Get()->TryInvokeTab(FName("TestViewportTab"));
+}
+
 void FSuperManagerModule::FixUpRedirectors()
 {
 	// COPY PASTED (with some slight modifications):
@@ -381,6 +400,10 @@ void FSuperManagerModule::FixUpRedirectors()
 	}
 }
 
+#pragma endregion // ContentBrowserMenuExtension
+
+#pragma region CustomEditorTab
+
 void FSuperManagerModule::RegisterAdvancedDeletionTab()
 {
 	FGlobalTabmanager::Get()->RegisterNomadTabSpawner
@@ -413,7 +436,78 @@ bool FSuperManagerModule::CanSpawnAdvancedDeletionTab(const FSpawnTabArgs& Spawn
 	return true;
 }
 
-#pragma endregion // ContentBrowserMenuExtension
+#pragma endregion // CustomEditorTab
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#pragma region TestViewportTab
+
+void FSuperManagerModule::RegisterTestViewportTab()
+{
+	UE_LOG(LogTemp, Warning, TEXT("FSuperManagerModule::RegisterTestViewportTab"));
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner
+	(
+		FName("TestViewportTab"),
+		FOnSpawnTab::CreateRaw(this, &FSuperManagerModule::OnSpawnTestViewportTab),
+		FCanSpawnTab::CreateRaw(this, &FSuperManagerModule::CanSpawnTestViewportTab)
+	)
+	.SetDisplayName(FText::FromString(TEXT("Test Viewport")));
+	//.SetMenuType(ETabSpawnerMenuType::Enabled);
+}
+
+TSharedRef<SDockTab> FSuperManagerModule::OnSpawnTestViewportTab(const FSpawnTabArgs& SpawnTabArgs)
+{
+	/*return
+		SNew(SDockTab).TabRole(ETabRole::NomadTab)
+		[
+			SNew(SAdvancedDeletionTab)
+				.TestString(TEXT("I am passing data"))
+		];*/
+
+	/*return SNew(SDockTab).TabRole(ETabRole::NomadTab)
+	[
+
+	];*/
+
+	//return SNew(SDockTab)
+	//[
+	//	SNew(SViewport)
+	//		.EnableGammaCorrection(false)
+	//		.IgnoreTextureAlpha(false)
+	//		// Link it with your SceneViewport here (details below)
+	//];
+
+	/*TSharedPtr<SViewport> ViewportWidget = SNew(SViewport)
+		.EnableGammaCorrection(false);
+
+	return SNew(SDockTab).TabRole(ETabRole::NomadTab)
+	[
+		SNew(SViewport)
+			.EnableGammaCorrection(false)
+			.IgnoreTextureAlpha(false)
+	];*/
+
+	//auto ViewportClient = MakeShareable(new FCommonViewportClient(SharedThis(this)));
+
+	//ViewportClient = MakeShareable(new FCommonViewportClient());
+
+	//TSharedPtr<FSceneViewport> SceneViewport = MakeShareable(new FSceneViewport(ViewportClient.Get(), ViewportWidget));
+	//ViewportWidget->SetViewportInterface(SceneViewport.ToSharedRef());
+
+	
+
+
+	//return SNew(SDockTab).TabRole(ETabRole::NomadTab); // The bare minimum for a tab window
+	return SNew(SDockTab); // The bare minimum for a tab window
+
+	//return TSharedRef<SDockTab>(); // Leaving this as-is causes a build error.
+}
+
+bool FSuperManagerModule::CanSpawnTestViewportTab(const FSpawnTabArgs& SpawnTabArgs)
+{
+	return true;
+}
+
+#pragma endregion // TestViewportTab
 
 #undef LOCTEXT_NAMESPACE
 	

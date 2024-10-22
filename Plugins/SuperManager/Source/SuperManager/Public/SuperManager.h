@@ -33,6 +33,9 @@ private:
 	// Open Advanced Deletion Tab
 	void OnAdvancedDeletionButtonClicked();
 
+	// Open Test Viewport Tab
+	void OnTestViewportTabButtonClicked();
+
 	void FixUpRedirectors();
 
 private:
@@ -45,14 +48,24 @@ private:
 private:
 
 	void RegisterAdvancedDeletionTab();
-
-	//DECLARE_DELEGATE_RetVal_OneParam( TSharedRef<SDockTab>, FOnSpawnTab, const FSpawnTabArgs& );
-	TSharedRef<SDockTab> OnSpawnAdvancedDeletionTab(const FSpawnTabArgs& SpawnTabArgs);
-
-	//DECLARE_DELEGATE_RetVal_OneParam(bool, FCanSpawnTab, const FSpawnTabArgs&);
-	bool CanSpawnAdvancedDeletionTab(const FSpawnTabArgs& SpawnTabArgs);
-	
+	TSharedRef<SDockTab> OnSpawnAdvancedDeletionTab(const FSpawnTabArgs& SpawnTabArgs); // DECLARE_DELEGATE_RetVal_OneParam( TSharedRef<SDockTab>, FOnSpawnTab, const FSpawnTabArgs& );
+	bool CanSpawnAdvancedDeletionTab(const FSpawnTabArgs& SpawnTabArgs); // DECLARE_DELEGATE_RetVal_OneParam(bool, FCanSpawnTab, const FSpawnTabArgs&);
 
 #pragma endregion // CustomEditorTab
 
+	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+	// Testing Viewports in a Tab window
+#pragma region TestViewportTab
+
+private:
+
+	void RegisterTestViewportTab();
+	TSharedRef<SDockTab> OnSpawnTestViewportTab(const FSpawnTabArgs& SpawnTabArgs);
+	bool CanSpawnTestViewportTab(const FSpawnTabArgs& SpawnTabArgs);
+
+private:
+	//TSharedPtr<struct FCommonViewportClient> ViewportClient;
+
+#pragma endregion // TestViewportTab
+	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 };
