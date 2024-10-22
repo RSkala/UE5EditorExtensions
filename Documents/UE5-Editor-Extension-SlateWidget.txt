@@ -96,3 +96,31 @@ Requests:
 * Can go to where asset is located after clicking it in the list
 
 ====================================================
+SPAWNING A TAB
+
+Steps for Spawning a Tab
+* Register a custom tab
+* Binding function to determine what will be in the tab
+* Invoke the tab from menu entry
+
+Use:
+FGlobalTabmanager::Get()->RegisterNomadTabSpawner()
+
+* A nomad tab is a tab that can be placed with major tabs or minor tabs in any tab well.
+
+Need to use SNew() to create Slate Widgets
+
+
+enum ETabRole : uint8
+{
+  MajorTab,
+  PanelTab,
+  NomadTab,
+  DocumentTab,
+  NumRoles
+};
+
+
+SNew(SDockTab).TabRole(ETabRole::NomadTab);
+
+====================================================

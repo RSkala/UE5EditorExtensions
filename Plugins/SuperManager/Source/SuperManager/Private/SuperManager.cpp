@@ -21,6 +21,9 @@ void FSuperManagerModule::StartupModule()
 
 	// Initialize our Content Browser Menu Extension
 	InitContentBrowserMenuExtension();
+
+	// Initialize our Custom Tab
+	RegisterAdvancedDeletionTab();
 }
 
 void FSuperManagerModule::ShutdownModule()
@@ -314,10 +317,9 @@ void FSuperManagerModule::OnDeleteEmptyFolderseButtonClicked()
 
 void FSuperManagerModule::OnAdvancedDeletionButtonClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("---------------------------------------------"));
 	UE_LOG(LogTemp, Warning, TEXT("FSuperManagerModule::OnDeleteEmptyFolderseButtonClicked"));
 
-
+	FGlobalTabmanager::Get()->TryInvokeTab(FName("AdvancedDeletion"));
 }
 
 void FSuperManagerModule::FixUpRedirectors()
@@ -376,6 +378,31 @@ void FSuperManagerModule::FixUpRedirectors()
 		FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
 		AssetToolsModule.Get().FixupReferencers(RedirectorsToFix);
 	}
+}
+
+void FSuperManagerModule::RegisterAdvancedDeletionTab()
+{
+	FGlobalTabmanager::Get()->RegisterNomadTabSpawner
+	(
+		FName("AdvancedDeletion"),
+		FOnSpawnTab::CreateRaw(
+			this,
+			&FSuperManagerModule::OnSpawnAdvancedDeletionTab),
+		FCanSpawnTab::CreateRaw(
+			this,
+			&FSuperManagerModule::CanSpawnAdvancedDeletionTab)
+	).SetDisplayName(FText::FromString(TEXT("Advanced Deletion")));
+}
+
+TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvancedDeletionTab(const FSpawnTabArgs& SpawnTabArgs)
+{
+	return SNew(SDockTab).TabRole(ETabRole::NomadTab);
+	//return TSharedRef<SDockTab>();
+}
+
+bool FSuperManagerModule::CanSpawnAdvancedDeletionTab(const FSpawnTabArgs& SpawnTabArgs)
+{
+	return true;
 }
 
 #pragma endregion // ContentBrowserMenuExtension
