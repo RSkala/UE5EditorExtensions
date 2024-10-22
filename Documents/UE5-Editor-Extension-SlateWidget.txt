@@ -167,4 +167,44 @@ void SAdvancedDeletionTab::Construct(const FArguments& InArgs)
   bCanSupportFocus = true;
 }
 
+===================================================
+SENDING DATA TO SLATE WIDGETS
+
+...
+SLATE_ARGUMENT(FString, TestString)
+...
+
+Constructing the Slate Widget:
+
+  return
+    SNew(SDockTab).TabRole(ETabRole::NomadTab)
+    [
+      SNew(SAdvancedDeletionTab)
+        .TestString(TEXT("I am passing data"))
+    ];
+
+Create the Widget asset:
+Content Browser -> Right-click -> Editor Utilities -> Editor Utility Widget
+
+---------------------------------------
+SLOTS
+* A widget will take up one slot
+* Square brackets in SNew() represents the slot
+
+
+SNew(SDockTab).TabRole(ETabRole::NomadTab)
+[
+  SNew(SAdvancedDeletionTab)
+    .TestString(TEXT("I am passing data"))
+];
+
+---------------------------------------
+Accessing our Args.
+* In the Construct() function:
+
+InArgs._<arg-name>;
+
+Example:
+InArgs._TestString;
+
 ====================================================

@@ -8,6 +8,8 @@ class SAdvancedDeletionTab : public SCompoundWidget
 {
 	SLATE_BEGIN_ARGS(SAdvancedDeletionTab) {}
 
+	SLATE_ARGUMENT(FString, TestString)
+
 	SLATE_END_ARGS()
 
 public:
