@@ -123,4 +123,48 @@ enum ETabRole : uint8
 
 SNew(SDockTab).TabRole(ETabRole::NomadTab);
 
+Register a new Tab:
+FGlobalTabmanager::Get()->RegisterNomadTabSpawner
+(
+  FName("AdvancedDeletion"),
+  FOnSpawnTab::CreateRaw(this, &FSuperManagerModule::OnSpawnAdvancedDeletionTab)
+).SetDisplayName(FText::FromString(TEXT("Advanced Deletion")));
+
+Creating the Tab:
+return SNew(SDockTab).TabRole(ETabRole::NomadTab);
+
+Open Tab:
+FGlobalTabmanager::Get()->TryInvokeTab(FName("AdvancedDeletion"));
+
+====================================================
+Display Slate Widgets in a View
+
+
+Create the C++ Class:
+* Note: You cannot create a SlateWidget directly from the Tools -> New C++ Class, so you have to select "None"
+* Ensure the that Editor module is selected!
+
+Need this header file included for your SlateWidget's header file:
+
+#include "Widgets/SCompoundWidget.h"
+
+SCompoundWidget
+
+Slate Widget classes should always begin with "S"
+
+In order to pass variable between Slate Widgets, start your widget class with:
+SLATE_BEGIN_ARGS(<Slate-Class-Name>){}
+...
+SLATE_END_ARGS()
+
+you also need:
+public:
+  void Construct(const FArguments& InArgs);
+
+cpp:
+void SAdvancedDeletionTab::Construct(const FArguments& InArgs)
+{
+  bCanSupportFocus = true;
+}
+
 ====================================================
