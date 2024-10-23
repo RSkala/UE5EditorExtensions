@@ -11,7 +11,7 @@ void SAdvancedDeletionTab::Construct(const FArguments& InArgs)
 	// Access our arguments like this:
 	//InArgs._TestString;
 
-	AssetsDataUnderSelectedFolderArray = InArgs._AssetsDataArray;
+	StoredAssetsData = InArgs._AssetsDataToStore;
 
 	/*ChildSlot
 	[
