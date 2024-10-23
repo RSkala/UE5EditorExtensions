@@ -250,4 +250,12 @@ Steps to Take for SListView:
 * Pass a TArray of asset data to Slate Widget
 * Use the data to generate a list view
 
+--------------------
+Construct SListView:
+* SNew()
+* Tell which data type it will be filled with
+  * SListView<TSharedPtr<FAssetData>>
+* ListSourceItems
+* OnGenerateRow()
+
 ========================================

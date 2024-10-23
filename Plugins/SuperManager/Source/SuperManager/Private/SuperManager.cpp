@@ -427,7 +427,7 @@ TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvancedDeletionTab(const FSpaw
 		[
 			SNew(SAdvancedDeletionTab)
 				.TestString(TEXT("I am passing data"))
-				.AssetsDataArray(GetAllAssetDataUnderSelectedFolder())
+				.AssetsDataToStore(GetAllAssetDataUnderSelectedFolder())
 		];
 
 

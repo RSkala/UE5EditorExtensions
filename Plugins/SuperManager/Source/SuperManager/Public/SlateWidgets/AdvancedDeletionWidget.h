@@ -17,5 +17,10 @@ public:
 	void Construct(const FArguments& InArgs);
 
 private:
+	TSharedRef<ITableRow> OnGenerateRowForList( // Function callback for OnGenerateRow(). Called when constructing a row in our listview
+		TSharedPtr<FAssetData> AssetDataToDisplay, // Data for a row
+		const TSharedRef<STableViewBase>& OwnerTable); // Widget that owns this row
+
+private:
 	TArray<TSharedPtr<FAssetData>> StoredAssetsData;
 };
