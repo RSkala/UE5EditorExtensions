@@ -208,3 +208,46 @@ Example:
 InArgs._TestString;
 
 ====================================================
+LAYING OUT WIDGET
+* Slots
+* VerticalBox
+* Fonts
+
+Can see available fonts and other editor styles here:
+* CoreStyle.cpp
+
+Constructing the widget:
+
+  // Font for Title Text
+  FSlateFontInfo TitleTextFont = FCoreStyle::Get().GetFontStyle(FName("EmbossedText"));
+  TitleTextFont.Size = 30;
+
+  // Add our elements to this widget's Slot
+  ChildSlot
+  [
+    // Main vertical box
+    SNew(SVerticalBox)
+
+      // First vertical slot for title text
+      + SVerticalBox::Slot()
+        .AutoHeight()
+        [
+          SNew(STextBlock)
+            .Text(FText::FromString(TEXT("Advanced Deletion")))
+            .Font(TitleTextFont)
+            .Justification(ETextJustify::Center)
+            .ColorAndOpacity(FColor::White)
+        ]
+
+  ];
+
+--------------------------------------
+SListView
+* A ListView widget observes and array of data items and creates visual representation of these items
+* Only works with TSharedPtr and UObject*
+
+Steps to Take for SListView:
+* Pass a TArray of asset data to Slate Widget
+* Use the data to generate a list view
+
+========================================

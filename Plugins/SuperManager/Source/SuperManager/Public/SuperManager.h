@@ -51,6 +51,8 @@ private:
 	TSharedRef<SDockTab> OnSpawnAdvancedDeletionTab(const FSpawnTabArgs& SpawnTabArgs); // DECLARE_DELEGATE_RetVal_OneParam( TSharedRef<SDockTab>, FOnSpawnTab, const FSpawnTabArgs& );
 	bool CanSpawnAdvancedDeletionTab(const FSpawnTabArgs& SpawnTabArgs); // DECLARE_DELEGATE_RetVal_OneParam(bool, FCanSpawnTab, const FSpawnTabArgs&);
 
+	TArray<TSharedPtr<FAssetData>> GetAllAssetDataUnderSelectedFolder();
+
 #pragma endregion // CustomEditorTab
 
 	// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

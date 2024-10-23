@@ -420,11 +420,14 @@ void FSuperManagerModule::RegisterAdvancedDeletionTab()
 
 TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvancedDeletionTab(const FSpawnTabArgs& SpawnTabArgs)
 {
+	// Here, we are creating the Slate Widget AND passing in the data to it!
+
 	return
 		SNew(SDockTab).TabRole(ETabRole::NomadTab)
 		[
 			SNew(SAdvancedDeletionTab)
 				.TestString(TEXT("I am passing data"))
+				.AssetsDataArray(GetAllAssetDataUnderSelectedFolder())
 		];
 
 
@@ -434,6 +437,42 @@ TSharedRef<SDockTab> FSuperManagerModule::OnSpawnAdvancedDeletionTab(const FSpaw
 bool FSuperManagerModule::CanSpawnAdvancedDeletionTab(const FSpawnTabArgs& SpawnTabArgs)
 {
 	return true;
+}
+
+TArray<TSharedPtr<FAssetData>> FSuperManagerModule::GetAllAssetDataUnderSelectedFolder()
+{
+	//return TArray<TSharedPtr<FAssetData>>();
+
+	TArray<TSharedPtr<FAssetData>> AvailableAssetData;
+	
+	TArray<FString> AssetsPathNames = UEditorAssetLibrary::ListAssets(SelectedFolderPaths[0]);
+
+	// Iterate through the assets found under the selected folder and add to the "unused assets" list
+	for (const FString& AssetPathName : AssetsPathNames)
+	{
+		// Don't touch root folder. Do not delete anything from Collections or Developers folders!
+		if (AssetPathName.Contains(TEXT("Collections")) ||
+			AssetPathName.Contains(TEXT("Developers")) ||
+			AssetPathName.Contains(TEXT("__ExternalActors__")) ||
+			AssetPathName.Contains(TEXT("__ExternalObjects__")))
+		{
+			continue;
+		}
+
+		// Ensure the asset exists (possibly removed when fixing up redirectors?)
+		if (!UEditorAssetLibrary::DoesAssetExist(AssetPathName))
+		{
+			continue;
+		}
+
+		// Found a valid asset path
+		const FAssetData AssetData = UEditorAssetLibrary::FindAssetData(AssetPathName);
+
+		// Make the asset data a TSharedPtr and add to the asset list
+		AvailableAssetData.Add(MakeShared<FAssetData>(AssetData));
+	}
+
+	return AvailableAssetData;
 }
 
 #pragma endregion // CustomEditorTab
