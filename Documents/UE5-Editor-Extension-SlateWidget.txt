@@ -258,4 +258,32 @@ Construct SListView:
 * ListSourceItems
 * OnGenerateRow()
 
+* ListItemsSource: Determines what data to display
+* OnGenerateRow:   Determines the visual representation of the data
+
+SNew(SScrollBox)
+  + SScrollBox::Slot()
+  [
+    SNew(SListView<TSharedPtr<FAssetData>>)
+      .ItemHeight(24.0f)
+      .ListItemsSource(&StoredAssetsData)
+      .OnGenerateRow(this, &SAdvancedDeletionTab::OnGenerateRowForList)
+  ]
+
+TSharedRef<ITableRow> SAdvancedDeletionTab::OnGenerateRowForList(TSharedPtr<FAssetData> AssetDataToDisplay, const TSharedRef<STableViewBase>& OwnerTable)
+{
+  const FString DisplayAssetName = AssetDataToDisplay->AssetName.ToString();
+
+  TSharedRef<STableRow<TSharedPtr<FAssetData>>> ListViewRowWidget =
+    SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable)
+    [
+      SNew(STextBlock)
+        .Text(FText::FromString(DisplayAssetName))
+    ];
+  
+  return ListViewRowWidget;
+}
+
+NOTE:
+* For some reason, after adding the scroll box stuff, there were linker errors regarding input, so "InputCore" needed to be added as a dependency
 ========================================
