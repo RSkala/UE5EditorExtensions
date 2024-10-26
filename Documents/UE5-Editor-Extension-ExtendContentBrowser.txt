@@ -152,3 +152,18 @@ Instead of .AutoHeight(), use:
 * The "V" stands for Vertical
 
 ====================================================
+SCheckBox
+
+* A Widget that can be toggled
+* OnCheckStateChanged()
+
+The OnCheckStateChanged is similar to OnGenerateRow for SListView
+
+-----------------------------
+More Notes on Widgets
+
+* SWidget can be constructed in a function that returns a TSharedRef of the corresponding type
+* Use OnCheckStateChanged() to find out the state of a check box
+* Be clear of the requirement for a member function
+
+====================================================
