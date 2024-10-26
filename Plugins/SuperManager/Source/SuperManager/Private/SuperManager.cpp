@@ -128,13 +128,13 @@ void FSuperManagerModule::AddContentBrowserMenuEntry(FMenuBuilder& MenuBuilder)
 	);
 
 	// Test viewport tab
-	MenuBuilder.AddMenuEntry
+	/*MenuBuilder.AddMenuEntry
 	(
 		FText::FromString(TEXT("Test Viewport Window")),
 		FText::FromString(TEXT("Create a new tab window with a viewport inside")),
 		FSlateIcon(),
 		FExecuteAction::CreateRaw(this, &FSuperManagerModule::OnTestViewportTabButtonClicked)
-	);
+	);*/
 }
 
 void FSuperManagerModule::OnDeleteUnusedAssetButtonClicked()
