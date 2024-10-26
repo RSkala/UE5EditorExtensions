@@ -145,3 +145,10 @@ UEditorAssetLibrary::DoesDirectoryHaveAssets
 UEditorAssetLibrary::DeleteDirectory(EmptyFolderPath)
 
 ====================================================
+Add Scrolling to a Vertical Box:
+
+Instead of .AutoHeight(), use:
+* .VAlign(VAlign_Fill)
+* The "V" stands for Vertical
+
+====================================================
