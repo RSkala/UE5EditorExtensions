@@ -94,6 +94,7 @@ TSharedRef<ITableRow> SAdvancedDeletionTab::OnGenerateRowForList(TSharedPtr<FAss
 
 	TSharedRef<STableRow<TSharedPtr<FAssetData>>> ListViewRowWidget =
 		SNew(STableRow<TSharedPtr<FAssetData>>, OwnerTable)
+			.Padding(FMargin(5.0f)) // Add a gap between each row
 		[
 			SNew(SHorizontalBox)
 				// First slot for check box
@@ -109,20 +110,26 @@ TSharedRef<ITableRow> SAdvancedDeletionTab::OnGenerateRowForList(TSharedPtr<FAss
 				+ SHorizontalBox::Slot()
 					.HAlign(HAlign_Center)
 					.VAlign(VAlign_Fill)
-					.FillWidth(0.2f)
+					.FillWidth(0.5f)
 				[
 					ConstructTextForRowWidget(DisplayAssetClassName, AssetClassNameFont)
 				]
 
 				// Third slot for displaying asset name
 				+SHorizontalBox::Slot()
+					.HAlign(HAlign_Left)
+					.VAlign(VAlign_Fill)
 				[
 					ConstructTextForRowWidget(DisplayAssetName, AssetNameFont)
 				]
 
 				// Fourth slot for a button
-
-			
+				+SHorizontalBox::Slot()
+					.HAlign(HAlign_Right)
+					.VAlign(VAlign_Fill)
+				[
+					ConstructButtonForRowWidget(AssetDataToDisplay)
+				]
 		];
 	
 	return ListViewRowWidget;
@@ -178,10 +185,27 @@ TSharedRef<STextBlock> SAdvancedDeletionTab::ConstructTextForRowWidget(const FSt
 			.Font(FontToUse)
 			.ColorAndOpacity(FColor::White);
 
-	//return ConstructedTextBlock;
+	return ConstructedTextBlock;
 
-	return SNew(STextBlock)
-		.Text(FText::FromString(TextContent))
-		.Font(FontToUse)
-		.ColorAndOpacity(FColor::White);
+	//return SNew(STextBlock)
+	//	.Text(FText::FromString(TextContent))
+	//	.Font(FontToUse)
+	//	.ColorAndOpacity(FColor::White);
+}
+
+TSharedRef<SButton> SAdvancedDeletionTab::ConstructButtonForRowWidget(const TSharedPtr<FAssetData>& AssetDataToDisplay)
+{
+	TSharedRef<SButton> ConstructedButton =
+		SNew(SButton)
+			.Text(FText::FromString(TEXT("Delete")))
+			.OnClicked(this, &SAdvancedDeletionTab::OnDeleteButtonClicked, AssetDataToDisplay);
+
+	return ConstructedButton;
+	//return TSharedRef<SButton>();
+}
+
+FReply SAdvancedDeletionTab::OnDeleteButtonClicked(TSharedPtr<FAssetData> ClickedAssetData)
+{
+	DebugHeader::Print(ClickedAssetData->AssetName.ToString() + TEXT(" is clicked"), FColor::Green);
+	return FReply::Handled(); // You must return FReply::Handled, otherwise you might get a crash
 }

@@ -167,3 +167,10 @@ More Notes on Widgets
 * Be clear of the requirement for a member function
 
 ====================================================
+SButton
+
+* Clickable widget
+* Can be used to trigger functions
+* OnClicked - TODO: How to know how many parameters to pass?
+
+====================================================

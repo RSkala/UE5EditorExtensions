@@ -29,6 +29,10 @@ private:
 	// --- Asset Name and Asset Class Name Text ---
 	TSharedRef<STextBlock> ConstructTextForRowWidget(const FString& TextContent, const FSlateFontInfo& FontToUse);
 
+	// --- Button ===
+	TSharedRef<SButton> ConstructButtonForRowWidget(const TSharedPtr<FAssetData>& AssetDataToDisplay);
+	FReply OnDeleteButtonClicked(TSharedPtr<FAssetData> ClickedAssetData);
+
 	FSlateFontInfo GetEmbossedTextFont() const { return FCoreStyle::Get().GetFontStyle(FName("EmbossedText")); }
 
 private:
